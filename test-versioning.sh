@@ -10,21 +10,21 @@ echo ""
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "1. Testing root module (no version suffix - valid for v0/v1)"
-echo "   Module path: github.com/demo/go-module-versioning-demo"
+echo "   Module path: github.com/james00012/go-module-versioning-demo"
 cd "$SCRIPT_DIR"
 go build .
 echo "   ✓ SUCCESS - Root module builds fine"
 echo ""
 
 echo "2. Testing submodule/v2 (v2 suffix - valid)"
-echo "   Module path: github.com/demo/go-module-versioning-demo/submodule/v2"
+echo "   Module path: github.com/james00012/go-module-versioning-demo/submodule/v2"
 cd "$SCRIPT_DIR/submodule/v2"
 go build .
 echo "   ✓ SUCCESS - v2 submodule builds fine"
 echo ""
 
 echo "3. Testing submodule/v1 - LOCAL build (appears to work)"
-echo "   Module path: github.com/demo/go-module-versioning-demo/submodule/v1"
+echo "   Module path: github.com/james00012/go-module-versioning-demo/submodule/v1"
 cd "$SCRIPT_DIR/submodule/v1"
 go build .
 echo "   ✓ Local build succeeds (misleading!)"

@@ -64,10 +64,10 @@ This is what can mislead people:
 ```
 $ cd consumer && go build .
 go: errors parsing go.mod:
-go.mod:5: require github.com/demo/go-module-versioning-demo/submodule/v1:
+go.mod:5: require github.com/james00012/go-module-versioning-demo/submodule/v1:
     version "v1.0.0" invalid: malformed module path
-    "github.com/demo/go-module-versioning-demo/submodule/v1"
-go.mod:7: replace github.com/demo/go-module-versioning-demo/submodule/v1:
+    "github.com/james00012/go-module-versioning-demo/submodule/v1"
+go.mod:7: replace github.com/james00012/go-module-versioning-demo/submodule/v1:
     invalid module path
 ```
 

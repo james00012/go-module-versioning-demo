@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	submodule "github.com/demo/go-module-versioning-demo/submodule/v1"
+	submodule "github.com/james00012/go-module-versioning-demo/submodule/v1"
 )
 
 func main() {
