@@ -5,7 +5,7 @@ This repository demonstrates Go's semantic import versioning rules, specifically
 ## Quick Start
 
 ```bash
-git clone <this-repo>
+git clone https://github.com/james00012/go-module-versioning-demo.git
 cd go-module-versioning-demo
 ./test-versioning.sh
 ```
@@ -26,16 +26,34 @@ Go's module system has specific rules for version suffixes in module paths:
 
 This is what can mislead people:
 
-| Operation | `/v1` works? |
-|-----------|--------------|
-| Manually write `module .../v1` in go.mod | Yes |
-| `go build` locally | Yes |
-| `go test` locally | Yes |
-| **`require .../v1` as dependency** | **No** |
-| **`replace .../v1` directive** | **No** |
-| `go mod init .../v1` | No |
+| Operation | `/v1` works? | `/v2` works? |
+|-----------|--------------|--------------|
+| Manually write `module .../v1` in go.mod | Yes | Yes |
+| `go build` locally | Yes | Yes |
+| `go test` locally | Yes | Yes |
+| **`require .../v1` as dependency** | **No** | Yes |
+| **`replace .../v1` directive** | **No** | Yes |
+| **`go get .../v1`** | **No** | Yes |
+| `go mod init .../v1` | No | Yes |
 
 **The local build succeeding is misleading!** The module appears to work, but nobody can actually import it.
+
+## `go get` Behavior
+
+This is the key difference - Go doesn't recognize `/v1` as a module suffix:
+
+```bash
+# /v1 - Go looks for package in ROOT module (fails)
+$ go get github.com/james00012/go-module-versioning-demo/submodule/v1@v1.0.0
+go: module github.com/james00012/go-module-versioning-demo@v1.0.0 found,
+    but does not contain package .../submodule/v1
+
+# /v2 - Go recognizes as SEPARATE module (works)
+$ go get github.com/james00012/go-module-versioning-demo/submodule/v2@v2.0.0
+go: added github.com/james00012/go-module-versioning-demo/submodule/v2 v2.0.0
+```
+
+**Tagging doesn't help** - the fundamental issue is Go doesn't recognize `/v1` as a version suffix.
 
 ## Repository Structure
 
@@ -78,6 +96,15 @@ $ go mod init example.com/mylib/v1
 go: invalid module path "example.com/mylib/v1": major version suffixes must be
 in the form of /vN and are only allowed for v2 or later
 ```
+
+### When using go get:
+
+```
+$ go get .../submodule/v1@v1.0.0
+go: module ...@v1.0.0 found, but does not contain package .../submodule/v1
+```
+
+Go treats `/v1` as a package path, not a module path, so it downloads the root module and looks inside.
 
 ## Why This Matters
 
