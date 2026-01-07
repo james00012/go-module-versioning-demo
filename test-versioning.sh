@@ -1,74 +1,43 @@
 #!/bin/bash
-# This script demonstrates Go module versioning rules
-# Key rule: /v1 suffix is NOT allowed, only /v2+ is allowed
-
-echo "=============================================="
-echo "Go Module Versioning Demo"
-echo "=============================================="
-echo ""
+# Demonstrates that /v1 module suffixes don't work in Go
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-echo "1. Testing root module (no version suffix - valid for v0/v1)"
-echo "   Module path: github.com/james00012/go-module-versioning-demo"
-cd "$SCRIPT_DIR"
-go build .
-echo "   ✓ SUCCESS - Root module builds fine"
+echo "=== Go Module /v1 Suffix Test ==="
 echo ""
 
-echo "2. Testing submodule/v2 (v2 suffix - valid)"
-echo "   Module path: github.com/james00012/go-module-versioning-demo/submodule/v2"
-cd "$SCRIPT_DIR/submodule/v2"
-go build .
-echo "   ✓ SUCCESS - v2 submodule builds fine"
+echo "1. Root module (no suffix) - go build"
+cd "$SCRIPT_DIR" && go build . && echo "   OK"
 echo ""
 
-echo "3. Testing submodule/v1 - LOCAL build (appears to work)"
-echo "   Module path: github.com/james00012/go-module-versioning-demo/submodule/v1"
-cd "$SCRIPT_DIR/submodule/v1"
-go build .
-echo "   ✓ Local build succeeds (misleading!)"
+echo "2. submodule/v2 - go build"
+cd "$SCRIPT_DIR/submodule/v2" && go build . && echo "   OK"
 echo ""
 
-echo "4. Testing submodule/v1 - IMPORT as dependency (FAILS)"
-echo "   Trying to use /v1 module as a dependency..."
+echo "3. submodule/v1 - go build (local)"
+cd "$SCRIPT_DIR/submodule/v1" && go build . && echo "   OK (but misleading!)"
+echo ""
+
+echo "4. submodule/v1 - import as dependency"
 cd "$SCRIPT_DIR/consumer"
-echo "   Consumer go.mod contents:"
-cat go.mod | grep -E "(require|replace)" | head -4
-echo ""
-echo "   Running: go build ."
 if go build . 2>&1; then
-    echo "   ✗ UNEXPECTED - v1 import was accepted"
+    echo "   UNEXPECTED: import succeeded"
 else
-    echo ""
-    echo "   ✓ EXPECTED - Cannot import module with /v1 suffix"
+    echo "   FAILS as expected - /v1 cannot be imported"
 fi
 echo ""
 
-echo "5. Attempting 'go mod init' with /v1 suffix"
+echo "5. go mod init with /v1"
 TEMP_DIR=$(mktemp -d)
 cd "$TEMP_DIR"
 if go mod init example.com/test/v1 2>&1; then
-    echo "   ✗ UNEXPECTED - v1 suffix was accepted"
+    echo "   UNEXPECTED: accepted"
 else
-    echo "   ✓ EXPECTED - 'go mod init' rejects /v1 suffix"
+    echo "   FAILS as expected"
 fi
 rm -rf "$TEMP_DIR"
 echo ""
 
-echo "=============================================="
-echo "CONCLUSION:"
-echo ""
-echo "  /v1 suffix DOES NOT WORK in Go modules."
-echo ""
-echo "  - You CAN manually write 'module .../v1' in go.mod"
-echo "  - You CAN build it locally (go build works)"
-echo "  - But NOBODY can import it as a dependency!"
-echo "  - 'go mod init .../v1' is explicitly rejected"
-echo ""
-echo "  The local build succeeding is misleading - the module"
-echo "  is fundamentally broken because it can't be imported."
-echo ""
-echo "  For v0/v1: Use bare path (no suffix)"
-echo "  For v2+:   Use /vN suffix (required)"
-echo "=============================================="
+echo "=== Conclusion ==="
+echo "/v1 builds locally but cannot be imported."
+echo "Use bare path for v0/v1, use /vN suffix for v2+."
